@@ -14,14 +14,18 @@
       --accent: #0b9e6f;
       --radius: .75rem;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #111827;
-        --bg-alt: #1f2937;
-        --text: #f9fafb;
-        --accent: #0bd890;
-      }
-    }
+    @media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  header h1 {
+    font-size: 1.25rem;
+  }
+}
+
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, sans-serif;

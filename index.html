@@ -187,6 +187,8 @@
     let marker = L.marker([-25.2637, -57.5759]).addTo(map).bindPopup('Destino').openPopup();
     let origenMarker = L.marker([-25.2637, -57.5759]).addTo(map).bindPopup('Origen').openPopup();
     let ruta;
+const direccionInput = document.getElementById('direccion');
+const origenInput = document.getElementById('origen');
 
     async function geocodificar(direccion) {
   const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccion)}`);

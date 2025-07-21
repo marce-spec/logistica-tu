@@ -8,12 +8,16 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
   <style>
+    /* 🎨 Diseño base */
     :root {
-      --bg: #ffffff; --bg-alt: #f5f7fa; --text: #111827; --accent: #0b9e6f; --radius: .75rem;
+      --bg: #ffffff; --bg-alt: #f5f7fa;
+      --text: #111827; --accent: #0b9e6f;
+      --radius: .75rem;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #111827; --bg-alt: #1f2937; --text: #f9fafb; --accent: #0bd890;
+        --bg: #111827; --bg-alt: #1f2937;
+        --text: #f9fafb; --accent: #0bd890;
       }
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,7 +37,11 @@
       text-decoration: none; color: var(--accent);
       font-weight: bold; margin-bottom: .25rem;
     }
-    #searchToggle { cursor: pointer; background: none; border: 0; font-size: 1.5rem; align-self: flex-end; }
+    #searchToggle {
+      cursor: pointer; background: none;
+      border: 0; font-size: 1.5rem;
+      align-self: flex-end;
+    }
     #searchBar {
       display: none; width: 100%; padding: .5rem;
       margin-top: .5rem; border: 1px solid var(--accent);
@@ -45,7 +53,8 @@
     }
     section {
       background: var(--bg-alt); padding: 1.5rem;
-      border-radius: var(--radius); box-shadow: 0 2px 6px #0000001a;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 6px #0000001a;
     }
     label { display: block; margin-top: .75rem; font-weight: 600; }
     input, select, textarea {
@@ -60,7 +69,9 @@
       font-weight: 600; cursor: pointer;
     }
     button[type="submit"]:hover { opacity: .9; }
-    #map { height: 400px; border-radius: var(--radius); }
+    #map {
+      height: 400px; border-radius: var(--radius);
+    }
     #resumenEnvio {
       display: none; margin-top: 1rem; padding: 1rem;
       background: var(--bg); border: 1px solid var(--accent);
@@ -132,31 +143,42 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.min.js"></script>
   <script>
-    const form = document.getElementById('altaForm');
-    const precioOut = document.getElementById('precioEstimado');
-    const tarifaModo = document.getElementById("modoTarifa");
-    let map = L.map('map');
-    let origenCoords = [-25.285, -57.647];
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("altaForm");
+      const precioOut = document.getElementById("precioEstimado");
+      const tarifaModo = document.getElementById("modoTarifa");
+      let map = L.map("map");
+      let origenCoords = [-25.285, -57.647];
 
-    navigator.geolocation.getCurrentPosition(pos => {
-      origenCoords = [pos.coords.latitude, pos.coords.longitude];
-      map.setView(origenCoords, 13);
-      L.marker(origenCoords).addTo(map).bindPopup("📍 Tu ubicación").openPopup();
-    }, () => {
-      map.setView(origenCoords, 11);
-    });
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          origenCoords = [pos.coords.latitude, pos.coords.longitude];
+          map.setView(origenCoords, 13);
+          L.marker(origenCoords)
+            .addTo(map)
+            .bindPopup("📍 Tu ubicación")
+            .openPopup();
+        },
+        () => {
+          map.setView(origenCoords, 11);
+        }
+      );
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap",
+      }).addTo(map);
 
-    function obtenerRuta(destinoCoords) {
-      if (window.rutaControl) map.removeControl(window.rutaControl);
-      window.rutaControl = L.Routing.control({
-        waypoints: [L.latLng(origenCoords), L.latLng(destinoCoords)],
-        createMarker: () => null, show: false, addWaypoints: false, routeWhileDragging: false
-      }).on('routesfound', e => {
-        const km = (e.routes[0].summary.totalDistance / 1000).toFixed(1);
-        if (tarifaModo.value === "distancia") {
-          form.kilometros.value = km;
- [A](https://github.com/karames/curso-markdown-master/tree/9a65a17dd637e2be8fee24d6ea6c5558403d5487/markdown%2F100-codigo-fuente.md?copilot_analytics_metadata=eyJldmVudEluZm9fbWVzc2FnZUlkIjoiNWhzQ2ZHRVVYQVFSRkhDZWlid3EyIiwiZXZlbnRJbmZvX2NsaWNrRGVzdGluYXRpb24iOiJodHRwczpcL1wvZ2l0aHViLmNvbVwva2FyYW1lc1wvY3Vyc28tbWFya2Rvd24tbWFzdGVyXC90cmVlXC85YTY1YTE3ZGQ2MzdlMmJlOGZlZTI0ZDZlYTZjNTU1ODQwM2Q1NDg3XC9tYXJrZG93biUyRjEwMC1jb2RpZ28tZnVlbnRlLm1kIiwiZXZlbnRJbmZvX2NsaWNrU291cmNlIjoiY2l0YXRpb25MaW5rIiwiZXZlbnRJbmZvX2NvbnZlcnNhdGlvbklkIjoiZkZuMk5kaEQ3ZFpjUTdDS2hncXZNIn0%3D&citationMarker=9F742443-6C92-4C44-BF58-8F5A7C53B6F1)
+      window.obtenerRuta = function (destinoCoords) {
+        if (window.rutaControl) map.removeControl(window.rutaControl);
+        window.rutaControl = L.Routing.control({
+          waypoints: [L.latLng(origenCoords), L.latLng(destinoCoords)],
+          createMarker: () => null,
+          show: false,
+          addWaypoints: false,
+          routeWhileDragging: false,
+        }).on("routesfound", (e) => {
+          const km = (e.routes[0].summary.totalDistance / 1000).toFixed(1);
+          if (tarifaModo.value === "distancia") {
+            form.kilometros.value = km;
+          }
+        }).

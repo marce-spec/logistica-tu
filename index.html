@@ -199,6 +199,57 @@
       form.reset();
       calcularPrecio();
     });
+    function generarQR(texto) {
+  const canvas = document.createElement('canvas');
+  new QRCode(canvas, { text: texto, width: 120, height: 120 });
+  return canvas;
+}
+
+function registrarViajeLocal(data) {
+  const lista = document.getElementById('listaViajes');
+
+  const textoQR = `🎟️ Ticket de envío\nCliente: ${data.cliente}\nOrigen: ${data.origen}\nDestino: ${data.destino}\nDistancia: ${data.km} km\nServicio: ${data.servicio}\nPrecio estimado: ₲${data.precio}`;
+  const qrCanvas = generarQR(textoQR);
+
+  const viaje = document.createElement('div');
+  viaje.style.border = '1px solid #ccc';
+  viaje.style.borderRadius = '1rem';
+  viaje.style.padding = '1rem';
+  viaje.style.background = '#f5f7fa';
+
+  viaje.innerHTML = `
+    <p><strong>Cliente:</strong> ${data.cliente}</p>
+    <p><strong>Ruta:</strong> ${data.origen} → ${data.destino}</p>
+    <p><strong>Servicio:</strong> ${data.servicio}</p>
+    <p><strong>Precio:</strong> ₲${data.precio}</p>
+    <button onclick="enviarWhatsApp('${textoQR}')">📲 Enviar a WhatsApp</button>
+  `;
+
+  viaje.appendChild(qrCanvas);
+  lista.appendChild(viaje);
+}
+
+function enviarWhatsApp(msg) {
+  const mensaje = encodeURIComponent(msg);
+  window.open(`https://wa.me/595983559813?text=${mensaje}`, '_blank');
+}
+
+// Modificamos el envío del formulario:
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const data = {
+    cliente: form.cliente.value,
+    origen: form.origen.value,
+    destino: form.destino.value,
+    km: parseFloat(form.peso.value || 0),
+    servicio: form.servicio.value,
+    precio: (parseFloat(form.peso.value) * (form.servicio.value === "liviana" ? 5000 : form.servicio.value === "mediana" ? 30000 : 40000)).toLocaleString('es-PY')
+  };
+  registrarViajeLocal(data);
+  alert('Envío registrado en LogísticaTú');
+  form.reset();
+  calcularPrecio();
+});
   </script>
 </body>
 </html>

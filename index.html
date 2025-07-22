@@ -192,10 +192,10 @@
     form.destino.addEventListener('change', actualizarRuta);
 
     /* ----------  Registrar envío  ---------- */
-    form.addEventListener('submit', e => {
+  form.addEventListener('submit', e => {
   e.preventDefault();
 
-  // Datos base
+  // Captura de datos
   const cliente = form.cliente.value;
   const origen = form.origen.value;
   const destino = form.destino.value;
@@ -206,7 +206,7 @@
   const codigo = 'TK' + Math.floor(100000 + Math.random() * 900000);
   const whatsappNum = form.whatsappCliente.value.replace(/\D/g, '');
 
-  // Texto del envío
+  // Contenido del QR
   const contenidoQR = `
 Cliente: ${cliente}
 Origen: ${origen}
@@ -220,11 +220,13 @@ Código: #${codigo}
 
   const qrLink = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(contenidoQR)}`;
 
-  // Mensaje para enviar al cliente
+  // Mensaje final
   const mensaje = `📦 Envío registrado por LogísticaTú\n\n${contenidoQR}\n\n🖼️ Tu código QR: ${qrLink}`;
 
-  // Abrir WhatsApp para enviar
-  window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(mensaje)}`, '_blank');
+  // Enviar por WhatsApp
+  if (whatsappNum) {
+    window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(mensaje)}`, '_blank');
+  }
 
   alert('Envío registrado y enviado al cliente 🚚');
   form.reset();

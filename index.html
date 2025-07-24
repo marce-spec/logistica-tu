@@ -1,265 +1,90 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LogísticaTú</title>
-  <meta name="description" content="Portal de gestión de envíos y flota – LogísticaTú🇵🇾"/>
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <!-- Leaflet Routing Machine CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Envío</title>
   <style>
-    :root {
-      --bg: #ffffff;
-      --bg-alt: #f5f7fa;
-      --text: #111827;
-      --accent: #0b9e6f;
-      --radius: .75rem;
-    }
-
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);display:grid;grid-template-rows:auto 1fr auto;min-height:100vh}
-    header,footer{padding:1rem 2rem}
-    header{display:flex;align-items:center;justify-content:space-between;background:var(--bg-alt);border-bottom:1px solid #00000011}
-    header h1{font-size:1.5rem}
-    #searchToggle{cursor:pointer;background:none;border:0;font-size:1.5rem}
-    #searchBar{display:none;width:100%;padding:.5rem;margin-top:.5rem;border:1px solid var(--accent);border-radius:var(--radius)}
-    main{padding:2rem;display:grid;gap:2rem;grid-template-columns:1fr 1fr}
-    section{background:var(--bg-alt);padding:1.5rem;border-radius:var(--radius);box-shadow:0 2px 6px #0000001a}
-    h2{margin-bottom:1rem}
-    label{display:block;margin-top:.75rem;font-weight:600}
-    input,select,textarea{width:100%;padding:.5rem;margin-top:.25rem;border:1px solid var(--accent);border-radius:var(--radius);background:var(--bg);color:var(--text)}
-    button[type="submit"]{margin-top:1rem;padding:.6rem 1.2rem;background:var(--accent);border:0;border-radius:var(--radius);color:#fff;font-weight:600;cursor:pointer}
-    button[type="submit"]:hover{opacity:.9}
-    #precioEstimado{margin-top:.5rem;font-weight:700}
-    #map{height:400px;border-radius:var(--radius)}
-    footer{text-align:center;font-size:.875rem;opacity:.7}
-    @media (max-width:900px){main{grid-template-columns:1fr}}
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    label { display: block; margin-bottom: 1rem; }
+    input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.3rem; }
+    button { padding: 0.8rem 1.2rem; background-color: #2196F3; color: white; border: none; cursor: pointer; }
+    #map { width: 100%; height: 300px; background-color: #ddd; }
   </style>
 </head>
-
 <body>
-<header style="background:var(--accent); color:#fff; border-bottom:1px solid #00000011; padding:1rem 2rem; display:flex; flex-direction:column; gap:.75rem;">
-  <!-- Título con ícono -->
-  <div style="display:flex;align-items:center;justify-content:space-between;">
-    <h1 style="font-size:1.5rem;display:flex;align-items:center;gap:.5rem;">🚚 LogísticaTú</h1>
-    <button id="searchToggle" aria-label="Buscar" title="Buscar" style="cursor:pointer;background:none;border:0;font-size:1.5rem;color:#fff;">🔍</button>
-  </div>
 
-  <!-- Botones debajo del título -->
-  <div style="display:flex;gap:1rem;justify-content:flex-start;">
-    <a href="tel:+595983559813" style="display:flex;align-items:center;text-decoration:none;color:#fff;font-weight:600;">
-      📞 <span style="margin-left:.4rem;">Llamar</span>
-    <a href="https://wa.me/595983559813" target="_blank" style="display:flex;align-items:center;text-decoration:none;color:#fff;font-weight:600;">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="20" height="20" style="margin-right:.4rem;" />
-  <span>WhatsApp</span>
-</a>
-  </div>
-</header>
+<section>
+  <h1>Registrar Cliente</h1>
+  <form id="envioForm">
 
-  <input id="searchBar" type="search" placeholder="Buscar envíos, clientes, conductores…"/>
+    <label>Origen
+      <input type="text" id="origen" name="origen" placeholder="Calle Nº, Ciudad, Paraguay" required />
+    </label>
 
-  <main>
-    <section>
-      <h2>Alta de nuevo envío</h2>
-      <form id="altaForm">
-        <label>Cliente
-          <input type="text" name="cliente" required/>
-        </label>
-        <label>WhatsApp del cliente
-  <input type="tel" name="whatsappCliente" required placeholder="Ej: +5959..."/>
-</label>
+    <label>Destino
+      <input type="text" id="destino" name="destino" placeholder="Calle Nº, Ciudad, Paraguay" required />
+    </label>
 
-        <label>Origen
-          <input type="text" id="origen" name="origen" placeholder="Calle Nº, Ciudad, Paraguay" required/>
-        </label>
+    <label>Kilómetro (km)
+      <input type="number" name="peso" min="0.1" step="0.1" required readonly value="5.0" />
+    </label>
 
-        <label>Destino
-          <input type="text" id="destino" name="destino" placeholder="Calle Nº, Ciudad, Paraguay" required/>
-        </label>
+    <label>Tipo de servicio
+      <select name="servicio" required>
+        <option value="liviana">Liviana</option>
+        <option value="mediana">Mediana</option>
+        <option value="pesada">Pesada</option>
+      </select>
+    </label>
 
-        <label>Kilómetro (km)
-          <input type="number" name="peso" min="0.1" step="0.1" required readonly/>
-        </label>
+    <label>Observaciones
+      <textarea name="obs" rows="2"></textarea>
+    </label>
 
-        <label>Tipo de servicio
-          <select name="servicio" required>
-            <option value="liviana">Liviana</option>
-            <option value="mediana">Mediana</option>
-            <option value="pesada">Pesada</option>
-          </select>
-        </label>
+    <label>Número de WhatsApp del cliente
+      <input type="tel" id="whatsappCliente" placeholder="+595XXXXXXXXX" required />
+    </label>
 
-        <label>Observaciones
-          <textarea name="obs" rows="2"></textarea>
-        </label>
+    <p id="precioEstimado">Precio estimado: ₲0</p>
 
-        <p id="precioEstimado">Precio estimado: ₲0</p>
+    <button type="submit">Registrar envío</button>
+  </form>
+</section>
 
-        <button type="submit">Registrar envío</button>
-      </form>
-    </section>
+<section>
+  <h2>Ruta – Paraguay</h2>
+  <div id="map"></div>
+</section>
 
-    <section>
-      <h2>Ruta – Paraguay</h2>
-      <div id="map"></div>
-    </section>
-  </main>
-
-  <footer>
-    &copy; 2025 LogísticaTú – Derechos Reservados a Marcelo Benitez Noguera | HTML5
-  </footer>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Leaflet Routing Machine -->
-  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-
-  <script>
-    /* ----------  Buscador  ---------- */
-    const btn = document.getElementById('searchToggle');
-    const bar = document.getElementById('searchBar');
-    btn.addEventListener('click', () => { bar.style.display = bar.style.display === 'block' ? 'none' : 'block'; bar.focus(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') bar.style.display = 'none'; });
-
-    /* ----------  Precio  ---------- */
-    const form = document.getElementById('altaForm');
-    const precioOut = document.getElementById('precioEstimado');
-
-    function calcularPrecio() {
-      const km = parseFloat(form.peso.value) || 0;
-      const servicio = form.servicio.value;
-      const tarifas = { liviana: 5000, mediana: 30000, pesada: 40000 };
-      const precio = km * tarifas[servicio];
-      precioOut.textContent = `Precio estimado: ₲${precio.toLocaleString('es-PY')}`;
-    }
-    form.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calcularPrecio));
-
-    /* ----------  Mapa y ruta  ---------- */
-    const map = L.map('map').setView([-25.2637, -57.5759], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    const icons = {
-      green: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }),
-      red:   new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })
-    };
-
-    let oMarker, dMarker, router;
-
-    function geocode(dir, cb) {
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dir + ', Paraguay')}`)
-        .then(r => r.json())
-        .then(d => d[0] ? cb(+d[0].lat, +d[0].lon) : alert('Dirección no encontrada'));
-    }
-
-    function actualizarRuta() {
-      const orig = form.origen.value.trim(), dest = form.destino.value.trim();
-      if (!orig || !dest) return;
-
-      geocode(orig, (lat1, lng1) => {
-        geocode(dest, (lat2, lng2) => {
-          if (oMarker) map.removeLayer(oMarker);
-          if (dMarker) map.removeLayer(dMarker);
-          if (router) map.removeControl(router);
-
-          oMarker = L.marker([lat1, lng1], { icon: icons.green }).addTo(map).bindPopup('Origen');
-          dMarker = L.marker([lat2, lng2], { icon: icons.red   }).addTo(map).bindPopup('Destino');
-          map.fitBounds([[lat1, lng1], [lat2, lng2]]);
-
-          router = L.Routing.control({
-            waypoints: [L.latLng(lat1, lng1), L.latLng(lat2, lng2)],
-            routeWhileDragging: false,
-            createMarker: () => null,
-            lineOptions: { styles: [{ color: '#0b9e6f', weight: 5 }] }
-          }).addTo(map);
-
-          router.on('routesfound', e => {
-            const km = (e.routes[0].summary.totalDistance / 1000).toFixed(1);
-            form.peso.value = km;
-            calcularPrecio();
-          });
-        });
-      });
-    }
-
-    form.origen.addEventListener('change', actualizarRuta);
-    form.destino.addEventListener('change', actualizarRuta);
-
-    /* ----------  Registrar envío  ---------- */
-  form.addEventListener('submit', e => {
-  e.preventDefault();
-
-  // Captura de datos
-  const cliente = form.cliente.value;
-  const origen = form.origen.value;
-  const destino = form.destino.value;
-  const distancia = form.peso.value;
-  const servicio = form.servicio.value;
-  const precio = parseInt(distancia) * 30000;
-  const fecha = new Date().toLocaleString('es-PY');
-  const codigo = 'TK' + Math.floor(100000 + Math.random() * 900000);
-  const whatsappNum = form.whatsappCliente.value.replace(/\D/g, '');
-
-  // Contenido del QR
-  const contenidoQR = `
-Cliente: ${cliente}
-Origen: ${origen}
-Destino: ${destino}
-Distancia: ${distancia} km
-Servicio: ${servicio}
-Precio: ₲${precio.toLocaleString('es-PY')}
-Fecha: ${fecha}
-Código: #${codigo}
-`.trim();
-
-  const qrLink = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(contenidoQR)}`;
-
-  // Mensaje final
-  const mensaje = `📦 Envío registrado por LogísticaTú\n\n${contenidoQR}\n\n🖼️ Tu código QR: ${qrLink}`;
-
-  // Enviar por WhatsApp
-  if (whatsappNum) {
-    window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(mensaje)}`, '_blank');
-  }
-
-  alert('Envío registrado y enviado al cliente 🚚');
-  form.reset();
-  calcularPrecio();
-});
-    <script>
-  document.querySelector("form").addEventListener("submit", function (e) {
+<script>
+  document.getElementById("envioForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
-    // Capturamos los datos del formulario
+    // Capturar datos del formulario
     const origen = document.getElementById("origen").value;
     const destino = document.getElementById("destino").value;
     const peso = document.querySelector("input[name='peso']").value;
     const servicio = document.querySelector("select[name='servicio']").value;
     const obs = document.querySelector("textarea[name='obs']").value;
+    const numeroCliente = document.getElementById("whatsappCliente").value;
 
-    // Número de WhatsApp del cliente (simulado aquí, deberías capturarlo desde un campo)
-    const numeroCliente = "+595XXXXXXXXX"; // ← Reemplaza con el dato real del cliente
-    const numeroWeb = "+595YYYYYYYYY";    // ← Reemplaza con tu número de empresa
+    const numeroWeb = "+595YYYYYYYYY"; // ← Reemplaza con el número de WhatsApp de tu empresa
 
     const mensaje = `📝 Registro de envío:
 📍 Origen: ${origen}
 📍 Destino: ${destino}
 🚚 Kilómetro: ${peso} km
-📦 Tipo de servicio: ${servicio}
+📦 Servicio: ${servicio}
 💬 Observaciones: ${obs}`;
 
-    // Envío a cliente
+    // Abrir WhatsApp del cliente
     window.open(`https://wa.me/${numeroCliente.replace("+", "")}?text=${encodeURIComponent(mensaje)}`, "_blank");
 
-    // Envío a número de la empresa/web
+    // Abrir WhatsApp de la empresa
     window.open(`https://wa.me/${numeroWeb.replace("+", "")}?text=${encodeURIComponent(mensaje)}`, "_blank");
   });
 </script>
-  </script>
+
 </body>
 </html>

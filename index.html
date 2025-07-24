@@ -231,6 +231,35 @@ Código: #${codigo}
   form.reset();
   calcularPrecio();
 });
+    <script>
+  document.querySelector("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    // Capturamos los datos del formulario
+    const origen = document.getElementById("origen").value;
+    const destino = document.getElementById("destino").value;
+    const peso = document.querySelector("input[name='peso']").value;
+    const servicio = document.querySelector("select[name='servicio']").value;
+    const obs = document.querySelector("textarea[name='obs']").value;
+
+    // Número de WhatsApp del cliente (simulado aquí, deberías capturarlo desde un campo)
+    const numeroCliente = "+595XXXXXXXXX"; // ← Reemplaza con el dato real del cliente
+    const numeroWeb = "+595YYYYYYYYY";    // ← Reemplaza con tu número de empresa
+
+    const mensaje = `📝 Registro de envío:
+📍 Origen: ${origen}
+📍 Destino: ${destino}
+🚚 Kilómetro: ${peso} km
+📦 Tipo de servicio: ${servicio}
+💬 Observaciones: ${obs}`;
+
+    // Envío a cliente
+    window.open(`https://wa.me/${numeroCliente.replace("+", "")}?text=${encodeURIComponent(mensaje)}`, "_blank");
+
+    // Envío a número de la empresa/web
+    window.open(`https://wa.me/${numeroWeb.replace("+", "")}?text=${encodeURIComponent(mensaje)}`, "_blank");
+  });
+</script>
   </script>
 </body>
 </html>

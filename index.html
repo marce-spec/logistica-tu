@@ -2,101 +2,122 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro de Envío – Olivazo</title>
+  <title>Olivazo-Py</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: url('https://via.placeholder.com/1200x800.png?text=Fondo+de+Olivos') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
     }
-    label {
-      display: block;
-      margin-top: 15px;
+    .product {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      max-width: 400px;
     }
-    input, select, textarea {
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    img {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      box-sizing: border-box;
+      max-width: 300px;
+      border-radius: 8px;
     }
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #25D366;
-      color: white;
+      padding: 10px;
+      margin: 5px;
       border: none;
+      background-color: #4caf50;
+      color: white;
+      border-radius: 5px;
       cursor: pointer;
     }
-    #map {
-      margin-top: 40px;
-      height: 300px;
-      background-color: #eee;
+    .discount {
+      color: green;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <h1>Registro de Envío</h1>
-
-  <form id="envioForm" onsubmit="enviarWhatsApp(event)">
-    <label>Origen
-      <input type="text" id="origen" name="origen" placeholder="Calle Nº, Ciudad, Paraguay" required />
-    </label>
-
-    <label>Destino
-      <input type="text" id="destino" name="destino" placeholder="Calle Nº, Ciudad, Paraguay" required />
-    </label>
-
-    <label>Kilómetro (km)
-      <input type="number" id="kilometro" name="peso" min="0.1" step="0.1" required readonly value="5.0"/>
-    </label>
-
-    <label>Tipo de servicio
-      <select id="servicio" name="servicio" required>
-        <option value="liviana">Liviana</option>
-        <option value="mediana">Mediana</option>
-        <option value="pesada">Pesada</option>
-      </select>
-    </label>
-
-    <label>Observaciones
-      <textarea id="obs" name="obs" rows="2"></textarea>
-    </label>
-
-    <label>Número de WhatsApp del cliente
-      <input type="tel" id="numeroCliente" name="numeroCliente" placeholder="Ej: 0984123456" required />
-    </label>
-
-    <p id="precioEstimado">Precio estimado: ₲0</p>
-
-    <button type="submit">Registrar envío</button>
-  </form>
-
-  <section>
-    <h2>Ruta – Paraguay</h2>
-    <div id="map">[Aquí se muestra el mapa]</div>
-  </section>
+  <h1>🫒 Olivazo-Py</h1>
+  <div class="gallery" id="productGallery"></div>
 
   <script>
-    function enviarWhatsApp(e) {
-      e.preventDefault();
+    const products = [
+      {
+        name: "Aceite de Oliva Virgen Extra",
+        price: 100000,
+        discountPrice: 80000,
+        image: "https://via.placeholder.com/300x200.png?text=Aceite+Olivazo",
+        description: "Botella 500ml - Calidad premium"
+      }
+    ];
 
-      const origen = document.getElementById("origen").value;
-      const destino = document.getElementById("destino").value;
-      const kilometro = document.getElementById("kilometro").value;
-      const servicio = document.getElementById("servicio").value;
-      const obs = document.getElementById("obs").value;
-      const numeroCliente = document.getElementById("numeroCliente").value.replace(/\D/g, "");
-
-      const mensaje = `📦 *Registro de Envío*\n\n🟢 Origen: ${origen}\n🔵 Destino: ${destino}\n📏 Kilómetro: ${kilometro} km\n🛠 Servicio: ${servicio}\n📝 Observaciones: ${obs}\n\nGracias por tu pedido.`;
-
-      const linkCliente = `https://wa.me/595${numeroCliente}?text=${encodeURIComponent(mensaje)}`;
-      const linkWeb = `https://wa.me/595983559813?text=${encodeURIComponent(mensaje + '\\n\\n📩 Cliente: ' + numeroCliente)}`;
-
-      window.open(linkCliente, "_blank");
-      window.open(linkWeb, "_blank");
+    function formatGs(amount) {
+      return "Gs. " + amount.toLocaleString();
     }
-  </script>
 
+    function renderProducts() {
+      const gallery = document.getElementById("productGallery");
+      products.forEach((product, index) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" />
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          <p id="price${index}"><strong>Precio unitario:</strong> ${formatGs(product.price)}</p>
+          <label>Cantidad: <input type="number" id="qty${index}" value="1" min="1" /></label>
+          <p id="total${index}"></p>
+          <div>
+            <button onclick="makeCall()">📞 Llamar</button>
+            <button onclick="sendWhatsApp(${index})">💬 WhatsApp</button>
+          </div>
+        `;
+        gallery.appendChild(div);
+        document.getElementById(`qty${index}`).addEventListener("input", () => updateTotal(index));
+        updateTotal(index);
+      });
+    }
+
+    function updateTotal(index) {
+      const qty = parseInt(document.getElementById(`qty${index}`).value);
+      const product = products[index];
+      const isDiscount = qty >= 2;
+      const unitPrice = isDiscount ? product.discountPrice : product.price;
+      const total = qty * unitPrice;
+
+      document.getElementById(`price${index}`).innerHTML = isDiscount
+        ? `<strong>Precio unitario:</strong> <span class="discount">${formatGs(unitPrice)} c/u (descuento)</span>`
+        : `<strong>Precio unitario:</strong> ${formatGs(unitPrice)}`;
+
+      document.getElementById(`total${index}`).innerText = `Total: ${formatGs(total)}`;
+    }
+
+    function makeCall() {
+      window.location.href = "tel:+595983559813";
+    }
+
+    function sendWhatsApp(index) {
+      const qty = parseInt(document.getElementById(`qty${index}`).value);
+      const product = products[index];
+      const unitPrice = qty >= 2 ? product.discountPrice : product.price;
+      const total = qty * unitPrice;
+      const message = `Hola! Quiero comprar ${qty} unidad(es) de "${product.name}" a ${formatGs(unitPrice)} cada una. Total: ${formatGs(total)}.`;
+      const encodedMsg = encodeURIComponent(message);
+      window.open(`https://wa.me/595983559813?text=${encodedMsg}`, '_blank');
+    }
+
+    renderProducts();
+  </script>
 </body>
 </html>
